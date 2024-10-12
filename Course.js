@@ -52,20 +52,33 @@ const courses = JSON.parse(rawData);
    dayOfWeek: dayOfWeek === 1 ? '星期一' : dayOfWeek === 2 ? '星期二' : dayOfWeek === 3 ? '星期三' : dayOfWeek === 4 ? '星期四' : dayOfWeek === 5 ? '星期五' : dayOfWeek === 6 ? '星期六' : '星期日'
  };
  
- // 转换todaySchedule为新的格式
- const formattedSchedule = {};
- ['1', '2', '3', '4', '5'].forEach(lesson => {
-   formattedSchedule[`course${lesson}`] = todaySchedule[parseInt(lesson) - 1].course || {};
- });
- 
- // 将dateInfo和formattedSchedule添加到output中
- const CourseOutput = {
-   dateInfo: dateInfo,
-   schedule: formattedSchedule
- };
- 
- // 输出课程表为JSON
- //console.log(JSON.stringify(CourseOutput, null, 2));
+// 转换todaySchedule为新的格式
+const formattedSchedule = {};
+['1', '2', '3', '4', '5'].forEach(lesson => {
+  formattedSchedule[`course${lesson}`] = {
+    name: "",         // 显式设置name为""
+    room: "",         // 显式设置room为""
+    teacher: ""       // 显式设置teacher为""
+  };
 
+  const currentLesson = todaySchedule[parseInt(lesson) - 1];
+  if (currentLesson.course) {
+    formattedSchedule[`course${lesson}`].name = currentLesson.course.name || "";
+    formattedSchedule[`course${lesson}`].room = currentLesson.course.room || "";
+    formattedSchedule[`course${lesson}`].teacher = currentLesson.course.teacher || "";
+  } else {           // 若无课程信息，则再次确认所有字段都设为""
+    formattedSchedule[`course${lesson}`].name = "";
+    formattedSchedule[`course${lesson}`].room = "";
+    formattedSchedule[`course${lesson}`].teacher = "";
+  }
+});
 
- module.exports = CourseOutput;
+// 将formattedSchedule和dateInfo合并到一个对象中
+const CourseOutput = {
+  dateInfo: dateInfo,
+  schedule: formattedSchedule
+  
+};
+
+// 修改module.exports以导出CourseOutput
+module.exports = CourseOutput;
